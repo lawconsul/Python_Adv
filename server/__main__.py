@@ -2,7 +2,7 @@ import yaml
 import json
 import socket
 from argparse import ArgumentParser
-
+import logging
 from resolvers import find_server_action
 from protocol import validate_request, make_200, make_500, make_400, make_404
 
@@ -12,6 +12,7 @@ config = {
     'port': 8000,
     'buffersize': 1024,
 }
+
 
 parser = ArgumentParser()
 parser.add_argument('-c', '--config', type=str, required=False,
@@ -32,18 +33,29 @@ host = args.host if args.host else config.get('host')
 port = args.port if args.port else config.get('port')
 buffersize = config.get('buffersize')
 
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=(
+        logging.FileHandler('server.log'),
+        logging.StreamHandler()
+    )
+)
+
+
 try:
     sock = socket.socket()
     sock.bind((host, port))
     sock.listen(5)
 
-    print(f'Server started with {host}:{port}')
+    logging.info(f'Server started with {host}:{port}')
 
     action_mapping = find_server_action()
 
     while True:
         client, (client_host, client_port)  = sock.accept()
-        print(f'Client {client_host}:{client_port} was connected')
+        logging.info(f'Client {client_host}:{client_port} was connected')
 
         bytes_request = client.recv(buffersize)
 
@@ -55,20 +67,20 @@ try:
             if controller:
                 try:
                     response = controller(request)
-                    print(f'Request: {bytes_request.decode()}')
+                    logging.debug(f'Request: {bytes_request.decode()}')
                 except Exception as err:
                     response = make_500(request)
-                    print(err)
+                    logging.critical(err)
             else:
-                response = make_404(request)
+                logging.error(f'Action with name {action} not found')
         else:
             response = make_404(request, 'Request is not valid')
-            print(f'Wrong request: {request}')
+            logging.error(f'Wrong request: {request}')
 
         string_response = json.dumps(response)
         client.send(string_response.encode())
         client.close()
 
 except KeyboardInterrupt:
-    print('Server shutdown')
+    logging.info('Server shutdown')
 

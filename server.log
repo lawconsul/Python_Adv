@@ -1,0 +1,14 @@
+
+2019-09-23 23:34:49,791 - INFO - Server started with localhost:8000
+2019-09-23 23:36:09,715 - INFO - Server started with localhost:8000
+2019-09-23 23:36:53,949 - INFO - Server started with localhost:8000
+2019-09-23 23:37:07,364 - INFO - Client 127.0.0.1:49784 was connected
+2019-09-23 23:37:16,021 - DEBUG - request: {'action': 'echo', 'data': 'echo_test', 'time': 1569263827.362301} - response: {'action': 'echo', 'time': 1569263813.947389, 'code': 200, 'data': 'echo_test'}
+2019-09-23 23:37:21,023 - DEBUG - Start : Mon Sep 23 23:37:16 2019 - End : Mon Sep 23 23:37:21 2019; Sleep: 5
+2019-09-23 23:37:21,023 - DEBUG - Request: {"action": "echo", "data": "echo_test", "time": 1569263827.362301}
+2019-09-23 23:37:33,987 - INFO - Client 127.0.0.1:49788 was connected
+2019-09-23 23:37:40,533 - DEBUG - request: {'action': 'timestamp', 'data': 'null', 'time': 1569263853.984937} - response: {'action': 'timestamp', 'time': 1569263813.947389, 'code': 200, 'data': 1569263860.533124}
+2019-09-23 23:37:45,533 - DEBUG - Start : Mon Sep 23 23:37:40 2019 - End : Mon Sep 23 23:37:45 2019; Sleep: 5
+2019-09-23 23:37:45,534 - DEBUG - Request: {"action": "timestamp", "data": "null", "time": 1569263853.984937}
+2019-09-23 23:38:20,170 - INFO - Client 127.0.0.1:49792 was connected
+2019-09-23 23:38:55,661 - ERROR - Action with name servererrors not found
