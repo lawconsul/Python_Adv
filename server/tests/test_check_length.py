@@ -1,5 +1,6 @@
 from random import choice
 from string import ascii_uppercase
+import protocol
 
 import pytest
 from datetime import datetime
@@ -30,9 +31,20 @@ max_len_data = 1024
 codes = [100, 101, 200, 201, 202, 400, 401, 402, 403, 404, 409, 410, 500]
 test_codes = [0, 100, 101, 200, 201, 202, 400, 401, 402, 403, 404, 409, 410, 500, 700]
 
+@pytest.fixture
+def len_action():
+    return
+
+@pytest.fixture
+def len_data():
+    return
+
+@pytest.fixture
+def code_id():
+    return
 
 @pytest.mark.randomize(len_action=int, min_num=1, max_num=max_len_action, ncalls=99)
-def test_length_data_make_response(len_action):
+def test_length_action_make_response(len_action):
     action = ''.join(choice(ascii_uppercase) for i in range(len_action))
     REQUEST['action'] = action
     response = make_response(REQUEST, CODE, DATA, date=TIME)

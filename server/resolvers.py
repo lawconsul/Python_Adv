@@ -16,4 +16,4 @@ def find_server_action():
         lambda value, item: value + getattr(item, 'actionmapping', []),
         routes, []
     )
-    return {item.get('action'):item.get('controller') for item in mapping if item}
+    return {item.get('action'): item.get('controller') for item in mapping if item}

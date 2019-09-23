@@ -1,43 +1,59 @@
 import pytest
+
 from datetime import datetime
+
 from protocol import make_response
 
-CODE = 200
-ACTION = 'test'
-TIME = datetime.now().timestamp()
-DATA = 'some client data'
 
-REQUEST = {
-    'action': ACTION,
-    'time': TIME,
-    'data': 'some client data'
-}
+@pytest.fixture
+def expected_code():
+    return 200
+
+@pytest.fixture
+def expected_action():
+    return 'test'
+
+@pytest.fixture
+def expected_time():
+    return datetime.now().timestamp()
+
+@pytest.fixture
+def expected_data():
+    return 'some client data'
+
+@pytest.fixture
+def initial_request(expected_action, expected_time, expected_data):
+    return {
+        'action': expected_action,
+        'time': expected_time,
+        'data': expected_data
+    }
 
 
-def test_action_make_response():
-    response = make_response(REQUEST, CODE, DATA, date=TIME)
+def test_action_make_response(initial_request, expected_action, expected_code, expected_data, expected_time):
+    response = make_response(initial_request, expected_code, expected_data, date=expected_time)
     action = response.get('action')
-    assert action == ACTION
+    assert action == expected_action
 
 
-def test_code_make_response():
-    response = make_response(REQUEST, CODE, DATA, date=TIME)
+def test_code_make_response(initial_request, expected_code, expected_data, expected_time):
+    response = make_response(initial_request, expected_code, expected_data, date=expected_time)
     code = response.get('code')
-    assert code == CODE
+    assert code == expected_code
 
 
-def test_time_make_response():
-    response = make_response(REQUEST, CODE, DATA, date=TIME)
+def test_time_make_response(initial_request, expected_code, expected_data, expected_time):
+    response = make_response(initial_request, expected_code, expected_data, date=expected_time)
     time = response.get('time')
-    assert time == TIME
+    assert time == expected_time
 
 
-def test_data_make_response():
-    response = make_response(REQUEST, CODE, DATA, date=TIME)
+def test_data_make_response(initial_request, expected_code, expected_data, expected_time):
+    response = make_response(initial_request, expected_code, expected_data, date=expected_time)
     data = response.get('data')
-    assert data == DATA
+    assert data == expected_data
 
 
-def test_none_request_make_response():
+def test_none_request_make_response(expected_code):
     with pytest.raises(AttributeError):
-        response = make_response(None, CODE)
+        make_response(None, expected_code)
