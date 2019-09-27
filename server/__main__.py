@@ -6,6 +6,9 @@ import logging
 from resolvers import find_server_action
 from protocol import validate_request, make_200, make_500, make_400, make_404
 
+import select
+from handlers import handle_tcp_request
+
 
 config = {
     'host': 'localhost',
@@ -43,10 +46,13 @@ logging.basicConfig(
     )
 )
 
+requests = []
+connections = []
 
 try:
     sock = socket.socket()
     sock.bind((host, port))
+    sock.setblocking(0)
     sock.listen(5)
 
     logging.info(f'Server started with {host}:{port}')
@@ -54,33 +60,29 @@ try:
     action_mapping = find_server_action()
 
     while True:
-        client, (client_host, client_port)  = sock.accept()
-        logging.info(f'Client {client_host}:{client_port} was connected')
+        try:
+            client, (client_host, client_port)  = sock.accept()
+            logging.info(f'Client {client_host}:{client_port} was connected')
+            connections.append(client)
+        except:
+            pass
 
-        bytes_request = client.recv(buffersize)
+        rlist, wlist, xlist = select.select(
+            connections, connections, connections, 0
+        )
 
-        request = json.loads(bytes_request)
+        for read_client in rlist:
+            bytes_request = read_client.recv(buffersize)
+            requests.append(bytes_request)
 
-        if validate_request(request):
-            action = request.get('action')
-            controller = action_mapping.get(action)
-            if controller:
-                try:
-                    response = controller(request)
-                    logging.debug(f'Request: {bytes_request.decode()}')
-                except Exception as err:
-                    response = make_500(request)
-                    logging.critical(err)
-            else:
-                logging.error(f'Action with name {action} not found')
-        else:
-            response = make_404(request, 'Request is not valid')
-            logging.error(f'Wrong request: {request}')
+        if requests:
+            bytes_request = requests.pop()
+            bytes_response = handle_tcp_request(bytes_request, action_mapping)
 
-        string_response = json.dumps(response)
-        client.send(string_response.encode())
-        client.close()
+            for write_client in wlist:
+                write_client.send(bytes_response)
 
 except KeyboardInterrupt:
     logging.info('Server shutdown')
+
 
