@@ -24,7 +24,7 @@ if __name__ == '__main__':
         'port': 8000,
         'buffersize': 1024,
     }
-
+ 
     parser = ArgumentParser()
     parser.add_argument('-c', '--config', type=str, required=False,
                         help='Sets config path')
