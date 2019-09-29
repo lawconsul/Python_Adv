@@ -13,6 +13,7 @@ import threading
 config = {
     'host': 'localhost',
     'port': 8000,
+    'this_port': 8000,
     'buffersize': 1024,
 }
 
@@ -21,9 +22,11 @@ parser = ArgumentParser()
 parser.add_argument('-c', '--config', type=str, required=False,
                     help='Sets config path')
 parser.add_argument('-ht', '--host', type=str, required=False,
-                    help='Sets server host')
+                    help='Sets other host')
 parser.add_argument('-p', '--port', type=str, required=False,
-                    help='Sets server port')
+                    help='Sets other hosts port')
+parser.add_argument('-p', '--this_port', type=str, required=False,
+                    help='Sets this hosts port')
 
 args = parser.parse_args()
 
@@ -34,6 +37,7 @@ if args.config:
 
 host = args.host if args.host else config.get('host')
 port = args.port if args.port else config.get('port')
+this_port = args.this_port if args.this_port else config.get('this_port')
 buffersize = config.get('buffersize')
 
 
@@ -41,7 +45,7 @@ logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=(
-        logging.FileHandler('server.log'),
+        logging.FileHandler('p2p_client.log'),
         logging.StreamHandler()
     )
 )
@@ -63,14 +67,14 @@ try:
     sock.setblocking(0)
     sock.listen(5)
 
-    logging.info(f'Server started with {host}:{port}')
+    logging.info(f'p2p_client started with port={port}, connected to {host}:{port}')
 
     action_mapping = find_server_action()
 
     while True:
         try:
-            client, (client_host, client_port)  = sock.accept()
-            logging.info(f'Client {client_host}:{client_port} was connected')
+            client, (client_host, client_port) = sock.accept()
+            logging.info(f'p2p_client {client_host}:{client_port} was connected')
             connections.append(client)
         except:
             pass
@@ -95,6 +99,6 @@ try:
                 write_thread.start()
 
 except KeyboardInterrupt:
-    logging.info('Server shutdown')
+    logging.info('p2p_client shutdown')
 
 
